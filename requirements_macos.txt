@@ -1,0 +1,48 @@
+# Core dependencies for macOS app
+firebase_admin==7.0.0
+google-cloud-firestore==2.21.0
+google-cloud-storage==3.2.0
+google-auth==2.40.3
+google-api-core==2.25.1
+grpcio==1.74.0
+grpcio-status==1.74.0
+
+# Web scraping and automation
+selenium==4.34.2
+selenium-stealth==1.0.6
+webdriver-manager==4.0.2
+requests==2.32.4
+beautifulsoup4==4.13.4
+lxml==6.0.0
+
+# Image processing
+opencv-python==4.12.0.88
+Pillow==11.3.0
+
+# Data processing
+pandas==2.3.1
+openpyxl==3.1.5
+python-docx==1.2.0
+python-pptx==1.0.2
+PyPDF2==3.0.1
+PyMuPDF==1.26.3
+
+# Translation and localization
+deep-translator==1.11.4
+babel==2.17.0
+
+# Utilities
+python-dotenv==1.1.1
+PyYAML==6.0.2
+psutil==7.0.0
+pyperclip==1.9.0
+
+# Development and packaging
+pyinstaller==6.5.0
+
+# Note: Excluded Windows-specific packages:
+# - pypiwin32
+# - win10toast
+# - winotify
+# - PyQt5 (using tkinter instead)
+# - PyQtWebEngine 
