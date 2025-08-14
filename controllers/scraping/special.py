@@ -427,6 +427,7 @@ def special_scraping(list_urls, set_value, user_data, logging=None):
             product_data = get_details(i+1, item_url, set_value, folder_path, logging)
             product_datas.append(product_data)
         except Exception as e:
+            print("error in ", item_url)
             print(f"商品 {i+1} の詳細取得に失敗しました: {e}")
             continue
         
