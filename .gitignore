@@ -70,4 +70,7 @@ Desktop.ini
 *.log
 
 # Firebase credentials (if you want to keep it private)
-buyma-6adf5-firebase-adminsdk-fbsvc-5be0be7cdb.json 
+buyma-6adf5-firebase-adminsdk-fbsvc-5be0be7cdb.json
+
+# Assets and images (exclude from Git)
+assets/images/ 

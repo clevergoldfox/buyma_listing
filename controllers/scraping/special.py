@@ -490,8 +490,25 @@ def get_details(index, item_url, set_value, folder_path, logging=None):
     img_paths = []
     for img_index, img_link in enumerate(img_links):
         img_path = os.path.join(folder_path, f"special_{index}_{img_index}.png")
-        created_path = image_handle(img_link, set_value["bg_path"] ,img_path)
-        img_paths.append(created_path)
+        # created_path = image_handle(img_link, set_value["bg_path"] ,img_path)
+        # img_paths.append(created_path)
+        
+        # Download and save image directly
+        try:
+            response = requests.get(img_link, timeout=30)
+            response.raise_for_status()  # Raise an exception for bad status codes
+            
+            with open(img_path, 'wb') as f:
+                f.write(response.content)
+            
+            img_paths.append(img_path)
+            if logging:
+                logging(f"画像 {img_index + 1} を保存: {img_path}")
+                
+        except Exception as e:
+            print(f"画像 {img_index + 1} の保存に失敗: {e}")
+            # Still add the path even if download failed
+            # img_paths.append(img_path)
         
     cat_gender = cats[1]
     cat_parent = cats[2]
