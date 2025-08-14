@@ -454,7 +454,7 @@ def get_details(index, item_url, set_value, folder_path, logging=None):
     if set_value["pretitle"] == "記載なし":
         item_title = trim_after_60_chars(item_pre_title + item_nex_title)
     else:
-        item_title = trim_after_60_chars(set_value["pretitle"] + item_pre_title + item_nex_title)
+        item_title = trim_after_60_chars(set_value["pretitle"] + translate_text(item_pre_title) + translate_text(item_nex_title))
         
     item_price_text = driver.find_element(By.XPATH, "//div[@class='prezzidettaglio']").text
     item_price = float(item_price_text.split(" ")[0].replace(".", "").replace(",", "."))
