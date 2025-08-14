@@ -44,6 +44,7 @@ env/
 ENV/
 .venv/
 
+
 # PyInstaller
 #  Usually these files are written by a python script from a template
 #  before PyInstaller builds the exe, so as to inject date/other infos into it.
@@ -71,3 +72,5 @@ Desktop.ini
 
 # Firebase credentials (if you want to keep it private)
 buyma-6adf5-firebase-adminsdk-fbsvc-5be0be7cdb.json 
+
+assets/images/ 
