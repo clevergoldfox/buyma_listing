@@ -423,9 +423,12 @@ def special_scraping(list_urls, set_value, user_data, logging=None):
             logging(f"商品 {i+1}/{len(item_urls)} を処理中... ({(i+1)/len(item_urls)*100:.1f}%)")
         
         print(f"\r合計{len(item_urls)}個中  {i+1} 個取得     完了率: {(i+1)/len(item_urls) * 100:.1f}%\n", end='', flush=True)
-        
-        product_data = get_details(i+1, item_url, set_value, folder_path, logging)
-        product_datas.append(product_data)
+        try:
+            product_data = get_details(i+1, item_url, set_value, folder_path, logging)
+            product_datas.append(product_data)
+        except Exception as e:
+            print(f"商品 {i+1} の詳細取得に失敗しました: {e}")
+            continue
         
     driver.quit()
     if logging:
