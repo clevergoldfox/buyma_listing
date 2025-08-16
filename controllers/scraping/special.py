@@ -8,8 +8,10 @@ from webdriver_manager.chrome import ChromeDriverManager
 from datetime import datetime
 import time
 import codecs
+import math
 import re
 import os
+import unicodedata
 
 from controllers.image_handle import image_handle
 
@@ -23,6 +25,20 @@ def translate_text(text):
         if translated_string:
             translated += translated_string + " "
     return translated
+
+def translate_Entext(text):
+    strings = text.split()
+    translated = ""
+    for string in strings:
+        translated_string = GoogleTranslator(source='it', target='en').translate(string)
+        if translated_string:
+            translated += translated_string + " "
+    
+    # Normalize to NFD (decompose accented characters)
+    normalized = unicodedata.normalize('NFD', translated)
+    # Remove combining marks (accents)
+    ascii_only = ''.join(c for c in normalized if unicodedata.category(c) != 'Mn')
+    return ascii_only
 
 # initial variables
 color_list = {
@@ -438,8 +454,8 @@ def special_scraping(list_urls, set_value, user_data, logging=None):
     return product_datas
     with open("test_shop.html", "w", encoding="utf-8") as file:
         file.write(driver.page_source)
-def trim_after_60_chars(s):
-    return s[:60] if len(s) > 60 else s
+def trim_after_chars(s, index):
+    return s[:index] if len(s) > index else s
 
 
 def get_details(index, item_url, set_value, folder_path, logging=None):
@@ -452,9 +468,9 @@ def get_details(index, item_url, set_value, folder_path, logging=None):
     item_pre_title = item_title_div.find_element(By.XPATH, ".//h1[@class='notranslate']").text
     item_nex_title = item_title_div.find_element(By.XPATH, ".//p").text
     if set_value["pretitle"] == "記載なし":
-        item_title = trim_after_60_chars(item_pre_title + item_nex_title)
+        item_title = trim_after_chars(item_pre_title + item_nex_title, 60)
     else:
-        item_title = trim_after_60_chars(set_value["pretitle"] + translate_text(item_pre_title) + translate_text(item_nex_title))
+        item_title = trim_after_chars(set_value["pretitle"] + translate_Entext(item_pre_title) + translate_Entext(item_nex_title), 60)
         
     item_price_text = driver.find_element(By.XPATH, "//div[@class='prezzidettaglio']").text
     item_price = float(item_price_text.split(" ")[0].replace(".", "").replace(",", "."))
@@ -476,9 +492,9 @@ def get_details(index, item_url, set_value, folder_path, logging=None):
     comment_div = driver.find_elements(By.XPATH,'//div[@class="aks-accordion-item"][.//h4[contains(text(), "Composizione")]]//div[contains(@class, "aks-accordion-item-content")]//p')
     if len(comment_div) >= 1:
         it_comment_text = comment_div[0].get_attribute("innerText").strip()
-        product_comment = f"{set_value['comment']} \n{item_nex_title} {translate_text(it_comment_text)}"
+        product_comment = f"{set_value['comment']} \n{translate_Entext(item_nex_title)} {translate_Entext(it_comment_text)}"
     else:
-        product_comment = item_nex_title    
+        product_comment = f"{set_value['comment']}\n{translate_Entext(item_nex_title)}"   
     
     img_links = []
     img_tags = driver.find_elements(By.XPATH,"//div[@class='dettagli']")
@@ -534,13 +550,16 @@ def get_details(index, item_url, set_value, folder_path, logging=None):
         # product_color = "マルチカラー"
         product_color = "色指定なし"
 
+    product_size_text = ""
     product_size = ""
     size_tags = driver.find_elements(By.XPATH, "//div[@class='tagliamobileform']")
     if len(size_tags):
         for size_tag in size_tags:
             size_text = size_tag.text.strip()
             if size_text:
-                product_size += f"{size_text}\n "
+                size_value = size_text.replace("½", ".5")
+                product_size_text += f"{size_value}\n "
+        product_size = trim_after_chars(product_size_text, 25)
     else:
         product_size = "指定なし"
 
@@ -555,8 +574,8 @@ def get_details(index, item_url, set_value, folder_path, logging=None):
     buyma_fee = set_value["buyma_fee"]
     profit = set_value["profit"]
     
-    product_price = (item_price + shipping_cost) * currency_ratio * buyma_fee *profit
-    
+    product_price = math.ceil((item_price + shipping_cost) * currency_ratio * buyma_fee *profit)
+    print(product_price,"JPY")
     if set_value["include_tax"]:
         include_tax = "お客様負担"
     else:

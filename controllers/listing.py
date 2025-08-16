@@ -28,6 +28,15 @@ chrome_options.add_argument("--window-size=1200,900")
 driver = None
 service = None
 
+import unicodedata
+
+def remove_spechar(text):
+    # Normalize to NFD (decompose accented characters)
+    normalized = unicodedata.normalize('NFD', text)
+    # Remove combining marks (accents)
+    ascii_only = ''.join(c for c in normalized if unicodedata.category(c) != 'Mn')
+    return ascii_only
+
 def get_driver():
     """Get or create Chrome WebDriver instance"""
     global driver, service
@@ -182,9 +191,6 @@ def listing(products, user, logging=None):
     if driver is None:
         print("Failed to get Chrome WebDriver")
         return
-
-    for product in products:
-        print(product)
     
     list_url = "https://www.buyma.com/my/sell/new?tab=b"
     driver.get(list_url)
@@ -201,12 +207,20 @@ def listing(products, user, logging=None):
     product_count = len(products)
     
     for index, product in enumerate(products):
+        print("========================================")
+        print(f"product {index} : {product[8]}")
+        print(f"title, {product[1]}")
+        print(f"comment, {product[5]}")
+        print(f"price, {product[18]}")
+        print(f"mount, {product[21]}")
+        print(f"color, {product[13]}")
+        print(f"size, {product[14]}")
         try:
         # Fix the file path - use raw string and forward slashes
             images = product[25]
             images_path = []
             file_input = driver.find_element(By.XPATH, "//input[@type='file']")
-            
+            driver.execute_script("arguments[0].value = '';", file_input)
             # Collect all valid file paths first
             for image in images:
                 # Convert to absolute path and normalize
@@ -234,24 +248,22 @@ def listing(products, user, logging=None):
             title_input_xpath = "//p[contains(text(), '商品名')]/ancestor::div[contains(@class, 'bmm-l-grid')]//input[@type='text']"
             title_input = wait_for_element(driver, By.XPATH, title_input_xpath)
             if title_input:
-                print("Title input found")
                 title_input.clear()
-                title = product[1]
+                title = remove_spechar(product[1])
                 title_input.send_keys(title)
             else:
                 print("Title input not found")
             
             comment_input_xpath = "//p[contains(text(), '商品コメント')]/ancestor::div[contains(@class, 'bmm-l-grid')]//textarea[@class='bmm-c-textarea']"
             comment_input = wait_for_element(driver, By.XPATH, comment_input_xpath)
+            comment = remove_spechar(product[5])
             if comment_input:
-                print("comment input found")
                 comment_input.clear()
-                comment_input.send_keys(product[5])
+                comment_input.send_keys(comment)
             else:
                 print("comment input not found")
 
             category = product[4]
-            print(category)
             if len(category.split("/")) == 3:
                 pre_cat = product[4].split("/")[0]
                 mid_cat = product[4].split("/")[1]
@@ -261,7 +273,6 @@ def listing(products, user, logging=None):
                 mid_cat = product[4].split("/")[1]
                 nex_cat = ""
 
-            print(pre_cat, mid_cat, nex_cat)
             category_input_xpath = "//p[contains(text(), 'カテゴリ')]/ancestor::div[contains(@class, 'bmm-l-grid')]//div[@class='Select-control']"
             category_input = wait_for_element(driver, By.XPATH, category_input_xpath)
             if not category_input:
@@ -289,17 +300,10 @@ def listing(products, user, logging=None):
                 WebDriverWait(driver, 30).until(
                     EC.presence_of_element_located((By.XPATH, "//div[@class='Select-menu-outer']"))
                 )
-                print("Dropdown menu appeared")
                 
                 # Debug: Print all available categories
                 try:
                     all_categories = driver.find_elements(By.XPATH, "//div[@class='Select-menu-outer']//*[contains(@class, 'Select-option') or contains(@class, 'Select-option')]")
-                    print(f"Available categories in dropdown: {len(all_categories)}")
-                    for i, cat in enumerate(all_categories[:10]):  # Show first 10
-                        try:
-                            print(f"  {i+1}: {cat.text}")
-                        except:
-                            print(f"  {i+1}: [text not readable]")
                 except Exception as e:
                     print(f"Could not get available categories: {e}")
                     
@@ -311,9 +315,7 @@ def listing(products, user, logging=None):
             wait = WebDriverWait(driver, 30)  # wait up to 10 seconds
             
             # Add debugging and better error handling for category selection
-            try:
-                print(f"Looking for category: {pre_cat}")
-                
+            try:                
                 # Try multiple XPath patterns to find the category
                 xpath_patterns = [
                     f"//div[@class='Select-menu-outer']//p[contains(text(), '{pre_cat}')]",
@@ -326,11 +328,9 @@ def listing(products, user, logging=None):
                 pre_cat_value_tag = None
                 for i, xpath in enumerate(xpath_patterns):
                     try:
-                        print(f"Trying pattern {i+1}: {xpath}")
                         pre_cat_value_tag = wait.until(
                             EC.presence_of_element_located((By.XPATH, xpath))
                         )
-                        print(f"Found category with pattern {i+1}")
                         break
                     except Exception as e:
                         print(f"Pattern {i+1} failed: {e}")
@@ -338,7 +338,6 @@ def listing(products, user, logging=None):
                 
                 if pre_cat_value_tag:
                     pre_cat_value_tag.click()
-                    print(f"Successfully clicked on category: {pre_cat}")
                 else:
                     print(f"All patterns failed for category: {pre_cat}")
                     driver.save_screenshot(f"category_error_{pre_cat}.png")
@@ -363,7 +362,6 @@ def listing(products, user, logging=None):
             wait = WebDriverWait(driver, 30)
 
             try:
-                print(f"Looking for subcategory: {mid_cat}")
                 mid_cat_value_tag = wait.until(
                     EC.presence_of_element_located((
                         By.XPATH,
@@ -371,7 +369,6 @@ def listing(products, user, logging=None):
                     ))
                 )
                 mid_cat_value_tag.click()
-                print(f"Successfully clicked on subcategory: {mid_cat}")
             except Exception as e:
                 print(f"Failed to find subcategory '{mid_cat}': {e}")
                 driver.save_screenshot(f"subcategory_error_{mid_cat}.png")
@@ -383,7 +380,6 @@ def listing(products, user, logging=None):
                     cat_divs = driver.find_elements(By.XPATH, category_input_xpath)
                     time.sleep(1)
 
-                print(cat_divs[2])
                 time.sleep(1)
 
                 try:
@@ -409,11 +405,9 @@ def listing(products, user, logging=None):
                         print(f"Normal click failed: {e}, trying JS click")
                         driver.execute_script("arguments[0].click();", third_cat_element)
                         
-                    print("Successfully clicked on third category dropdown")
                     wait = WebDriverWait(driver, 30)
 
                     try:
-                        print(f"Looking for subcategory: {nex_cat}")
                         nex_cat_value_tag = wait.until(
                             EC.presence_of_element_located((
                                 By.XPATH,
@@ -421,7 +415,6 @@ def listing(products, user, logging=None):
                             ))
                         )
                         nex_cat_value_tag.click()
-                        print(f"Successfully clicked on subcategory: {nex_cat}")
                     except Exception as e:
                         print(f"Failed to find subcategory '{nex_cat}': {e}")
                         driver.save_screenshot(f"subcategory_error_{nex_cat}.png")
@@ -436,11 +429,9 @@ def listing(products, user, logging=None):
             match = re.match(r'^([a-zA-Z ]+)', product[2])
             if match:
                 brand = match.group(1).strip().upper()
-            print(brand)
             brand_input_xpath = "//p[contains(text(), 'ブランド')]/ancestor::div[contains(@class, 'bmm-l-grid')]//input[@type='text']"
             brand_input = wait_for_element(driver, By.XPATH, brand_input_xpath)
             if brand_input:
-                print("brand input found")
                 brand_input.clear()
                 brand_input.send_keys(brand)
             else:
@@ -468,7 +459,6 @@ def listing(products, user, logging=None):
                 print(f"Normal click failed: {e}, trying JS click")
                 driver.execute_script("arguments[0].click();", season_input)
             # time.sleep(5)
-            print("season is ", product[15])
             season = product[15]
             wait = WebDriverWait(driver, 30)  # wait up to 10 seconds
 
@@ -607,11 +597,10 @@ def listing(products, user, logging=None):
             checkbox = driver.find_element(By.XPATH, '//tr[.//p[contains(text(), "DHL EXPRESS")]]//input[@type="checkbox"]')
             driver.execute_script("arguments[0].click();", checkbox)
 
-            time.sleep(5)
+            # time.sleep(5)
 
             
             list_limit = product[7]
-            print("list limit is", list_limit)
             list_limit_input_xpath = "//p[contains(text(), '購入期限(日本時間)')]/ancestor::div[contains(@class, 'bmm-l-grid')]//input[@type='text']"
             wait = WebDriverWait(driver, 30)
             list_limit_input = wait.until(
@@ -627,21 +616,17 @@ def listing(products, user, logging=None):
                 list_limit
             )
 
-            time.sleep(3)
+            # time.sleep(3)
             
             purchase_location = product[9]
             purchase_arr = purchase_location.split(">")
             purchase_country = purchase_arr[0]
             purchase_province = purchase_arr[1]
             
-            print(purchase_location)
-            
             if purchase_country == "日本":
-                print("Incountry")
                 purchase_location_sel_xpath = "//p[contains(text(), '買付地')]/ancestor::div[contains(@class, 'bmm-c-panel__item')]//input[@type='radio' and @value='domestic']"
                 sel_country = purchase_province
             else:
-                print("Outcountry")
                 purchase_location_sel_xpath = "//p[contains(text(), '買付地')]/ancestor::div[contains(@class, 'bmm-c-panel__item')]//input[@type='radio' and @value='overseas']"
                 sel_country = purchase_country
             wait = WebDriverWait(driver, 30)
@@ -684,9 +669,8 @@ def listing(products, user, logging=None):
             )
             purchase_country_value_tag.click()
             
-            time.sleep(2)
+            # time.sleep(2)
             purchase_divs = driver.find_elements(By.XPATH, purchase_sel_xpath)
-            print(purchase_country)
             if not purchase_country == "日本":
                 sel_count = 1
                 while len(purchase_divs) < len(purchase_arr):
@@ -709,14 +693,11 @@ def listing(products, user, logging=None):
             delivery_country = delivery_arr[0]
             delivery_province = delivery_arr[1]
             
-            print(delivery_location)
             
             if delivery_country == "日本":
-                print("Incountry")
                 delivery_location_sel_xpath = "//p[contains(text(), '発送地')]/ancestor::div[contains(@class, 'bmm-c-panel__item')]//input[@type='radio' and @value='domestic']"
                 sel_country = delivery_province
             else:
-                print("Outcountry")
                 delivery_location_sel_xpath = "//p[contains(text(), '発送地')]/ancestor::div[contains(@class, 'bmm-c-panel__item')]//input[@type='radio' and @value='overseas']"
                 sel_country = delivery_country
             wait = WebDriverWait(driver, 30)
@@ -725,7 +706,6 @@ def listing(products, user, logging=None):
             # )
             
             delivery_location_sel = driver.find_element(By.XPATH, delivery_location_sel_xpath)
-            print("delivery is ", delivery_location_sel)
             
             # wait = WebDriverWait(driver, 30)
             # delivery_location_sel = wait.until(EC.element_to_be_clickable((By.XPATH, delivery_location_sel_xpath)))
@@ -766,13 +746,12 @@ def listing(products, user, logging=None):
                     f"//div[@class='Select-menu-outer']//div[contains(text(), '{sel_country}')]"
                 ))
             )
-            html_code = delivery_country_value_tag.get_attribute("outerHTML")
-            print("delivery_country_value_tag HTML:", html_code)
+            # html_code = delivery_country_value_tag.get_attribute("outerHTML")
+            # print("delivery_country_value_tag HTML:", html_code)
             delivery_country_value_tag.click()
             
-            time.sleep(2)
+            # time.sleep(2)
             delivery_divs = driver.find_elements(By.XPATH, delivery_sel_xpath)
-            print(delivery_country)
             if not delivery_country == "日本":
                 sel_count = 1
                 while len(delivery_divs) < len(delivery_arr):
@@ -815,7 +794,6 @@ def listing(products, user, logging=None):
             list_memo_xpath = "//p[contains(text(), '出品メモ')]/ancestor::div[contains(@class, 'bmm-l-grid')]//textarea[@class='bmm-c-textarea']"
             list_memo_input = wait_for_element(driver, By.XPATH, list_memo_xpath)
             if list_memo_input:
-                print("list_memo input found")
                 list_memo_input.clear()
                 list_memo_input.send_keys(list_memo)
             else:
@@ -824,7 +802,6 @@ def listing(products, user, logging=None):
             buyer_name_input_xpath = "//span[text()='買付先名']/preceding-sibling::input[@type='text']"
             buyer_name_input = wait_for_element(driver, By.XPATH, buyer_name_input_xpath)
             if buyer_name_input:
-                print("buyer_name input found")
                 buyer_name_input.clear()
                 buyer_name_input.send_keys("TESSABIT")
             else:
@@ -833,7 +810,6 @@ def listing(products, user, logging=None):
             buyer_url_input_xpath = "//span[text()='URL']/preceding-sibling::input[@type='text']"
             buyer_url_input = wait_for_element(driver, By.XPATH, buyer_url_input_xpath)
             if buyer_url_input:
-                print("buyer_url input found")
                 buyer_url_input.clear()
                 buyer_url_input.send_keys("https://www.buyma.com/my/sell/new?tab=b")
             else:
@@ -848,7 +824,6 @@ def listing(products, user, logging=None):
             
             if config_btn:
                 config_btn.click()
-                print("found Config btn")
             else:
                 print("Not found Config btn")
                 
@@ -861,7 +836,6 @@ def listing(products, user, logging=None):
             
             if continue_btn:
                 continue_btn.click()
-                print("found Config btn")
             else:
                 print("Not found Config btn")
             
