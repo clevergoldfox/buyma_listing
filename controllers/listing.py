@@ -240,9 +240,17 @@ def listing(products, user, logging=None):
             # Send all file paths as a single string with newline separators
             all_files_path = '\n'.join(images_path)
             file_input.send_keys(all_files_path)
-                
-            # Wait for file upload to complete
-            human_delay(2, 4)
+
+            # Wait until all images are uploaded (wait for thumbnails to appear)
+            try:
+                # Adjust the XPath to match the image thumbnail elements after upload
+                num_images = len(images_path)
+                WebDriverWait(driver, 60).until(
+                    lambda d: len(d.find_elements(By.XPATH, "//div[contains(@class, 'bmm-c-image-thumb')]")) >= num_images
+                )
+                print("All images uploaded.")
+            except Exception as e:
+                print(f"Image upload wait failed: {e}")
             
             # Find and fill title field
             title_input_xpath = "//p[contains(text(), '商品名')]/ancestor::div[contains(@class, 'bmm-l-grid')]//input[@type='text']"
