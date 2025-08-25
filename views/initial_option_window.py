@@ -31,7 +31,7 @@ class InitialOptionWindow:
             self.root.iconbitmap(icon_path)
         except tk.TclError:
             print("Warning: Could not load application icon.")
-        self.root.geometry("1000x1200")
+        self.root.geometry("1000x1000")
         self.root.resizable(True, True)
         
         # constants
@@ -1716,20 +1716,17 @@ class InitialOptionWindow:
 
         # Row 0: タイトル開始文字 | モデル・ライン
         ttk.Label(main_frame, text="タイトル開始文字", font=("Arial", 12)).grid(row=0, column=0, sticky="w", pady=(0, 5), padx=PADX_LEFT)
-        ttk.Label(main_frame, text="モデル・ライン", font=("Arial", 12)).grid(row=0, column=1, sticky="w", pady=(0, 5), padx=PADX_RIGHT)
+        # ttk.Label(main_frame, text="モデル・ライン", font=("Arial", 12)).grid(row=0, column=1, sticky="w", pady=(0, 5), padx=PADX_RIGHT)
         self.title_var = tk.StringVar()
         self.title_combo = ttk.Combobox(main_frame, textvariable=self.title_var, state="readonly", width=50)
         self.title_combo['values'] = ("", "記載なし", "【送料無料】", "【VIP仕入れ】")
         self.title_combo.grid(row=1, column=0, sticky="we", pady=PADY, padx=PADX_LEFT)
         self.title_combo.current(0)
-        self.model_line_var = tk.StringVar()
-        self.model_line_entry = ttk.Entry(main_frame, textvariable=self.model_line_var, width=24)
-        self.model_line_entry.grid(row=1, column=1, sticky="we", pady=PADY, padx=PADX_RIGHT)
 
         # Row 2: 性別(specialshop)| カテゴリー(specialshop)
         # Labels
         ttk.Label(main_frame, text="性別(specialshop)", font=("Arial", 12)).grid(row=2, column=0, sticky="w", pady=(0, 5), padx=PADX_LEFT)
-        ttk.Label(main_frame, text="カテゴリー(specialshop)", font=("Arial", 12)).grid(row=2, column=1, sticky="w", pady=(0, 5), padx=PADX_RIGHT)
+        ttk.Label(main_frame, text="カテゴリー(specialshop)", font=("Arial", 12)).grid(row=4, column=0, sticky="w", pady=(0, 5), padx=PADX_LEFT)
         # Comboboxes
         self.gender_special_var = tk.StringVar()
         self.gender_special_combo = ttk.Combobox(main_frame, textvariable=self.gender_special_var, state="readonly", width=50)
@@ -1739,22 +1736,18 @@ class InitialOptionWindow:
         self.category_special_var = tk.StringVar()
         self.category_special_combo = ttk.Combobox(main_frame, textvariable=self.category_special_var, state="readonly", width=50)
         self.category_special_combo['values'] = self.special_categories
-        self.category_special_combo.grid(row=3, column=1, sticky="we", pady=PADY, padx=PADX_RIGHT)
+        self.category_special_combo.grid(row=5, column=0, sticky="we", pady=PADY, padx=PADX_LEFT)
         self.category_special_combo.current(0)
 
-        # Row 4: ブランド(specialshop)| カテゴリー(HERMES)
-        ttk.Label(main_frame, text="ブランド(specialshop)", font=("Arial", 12)).grid(row=4, column=0, sticky="w", pady=(0, 5), padx=PADX_LEFT)
-        ttk.Label(main_frame, text="カテゴリー(HERMES)", font=("Arial", 12)).grid(row=4, column=1, sticky="w", pady=(0, 5), padx=PADX_RIGHT)
+        # Row 0: ブランド(specialshop) title
+        ttk.Label(main_frame, text="ブランド(specialshop)", font=("Arial", 12)).grid(row=0, column=1, sticky="w", pady=(0, 5), padx=PADX_RIGHT)
+        
+        # Row 1-5: ブランド(specialshop) listbox
         self.brand_special_var = tk.StringVar()
-        self.brand_special_combo = ttk.Combobox(main_frame, textvariable=self.brand_special_var, state="readonly", width=50)
-        self.brand_special_combo['values'] = self.special_brands
-        self.brand_special_combo.grid(row=5, column=0, sticky="we", pady=PADY, padx=PADX_LEFT)
-        self.brand_special_combo.current(0)
-        self.hermes_category_var = tk.StringVar()
-        self.hermes_category_combo = ttk.Combobox(main_frame, textvariable=self.hermes_category_var, state="readonly", width=50)
-        self.hermes_category_combo['values'] = self.hermes_filter
-        self.hermes_category_combo.grid(row=5, column=1, sticky="we", pady=PADY, padx=PADX_RIGHT)
-        self.hermes_category_combo.current(0)
+        self.brand_special_listbox = tk.Listbox(main_frame, selectmode="multiple", width=50, height=8, exportselection=False)
+        for item in self.special_brands:
+            self.brand_special_listbox.insert(tk.END, item)
+        self.brand_special_listbox.grid(row=1, column=1, rowspan=5, sticky="nsew", pady=PADY, padx=PADX_RIGHT)
 
         # Row 6: 買付地 | 発送地
         ttk.Label(main_frame, text="買付地", font=("Arial", 12)).grid(row=6, column=0, sticky="w", pady=(0, 5), padx=PADX_LEFT)
@@ -1867,17 +1860,11 @@ class InitialOptionWindow:
         
         # Configure main frame to expand the terminal area
         main_frame.rowconfigure(19, weight=1)
-
-        self.brand_special_listbox = tk.Listbox(main_frame, selectmode="multiple", width=50, height=8, exportselection=False)
-        for item in self.special_brands:
-            self.brand_special_listbox.insert(tk.END, item)
-        self.brand_special_listbox.grid(row=5, column=0, sticky="we", pady=PADY, padx=PADX_LEFT)
-        # self.brand_special_listbox.selection_set(0)  # Optionally select the first item by default
         
-        self.hermes_category_listbox = tk.Listbox(main_frame, selectmode="multiple", width=50, height=8, exportselection=False)
-        for item in self.hermes_filter:
-            self.hermes_category_listbox.insert(tk.END, item)
-        self.hermes_category_listbox.grid(row=5, column=1, sticky="we", pady=PADY, padx=PADX_RIGHT)
+        # self.hermes_category_listbox = tk.Listbox(main_frame, selectmode="multiple", width=50, height=8, exportselection=False)
+        # for item in self.hermes_filter:
+        #     self.hermes_category_listbox.insert(tk.END, item)
+        # self.hermes_category_listbox.grid(row=5, column=1, sticky="we", pady=PADY, padx=PADX_RIGHT)
         # self.hermes_category_listbox.selection_set(0)  # Optionally select the first item by default
 
         # Row 16: 商品コメント (left), Background image preview (right)
