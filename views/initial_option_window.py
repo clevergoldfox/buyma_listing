@@ -1593,11 +1593,11 @@ class InitialOptionWindow:
         """Initialize all variables and constants"""
         # Initialize form variables
         self.title_var = tk.StringVar()
-        self.model_line_var = tk.StringVar()
+        # self.model_line_var = tk.StringVar()
         self.gender_special_var = tk.StringVar()
         self.category_special_var = tk.StringVar()
         self.brand_special_var = tk.StringVar()
-        self.hermes_category_var = tk.StringVar()
+        # self.hermes_category_var = tk.StringVar()
         self.purchased_place_var = tk.StringVar()
         self.delivery_location_var = tk.StringVar()
         self.product_comment_var = tk.StringVar()
@@ -2106,13 +2106,13 @@ class InitialOptionWindow:
     def on_complete(self):
         # Example: print the selected values
         pretitle = self.title_var.get()
-        model_line = self.model_line_var.get()
+        # model_line = self.model_line_var.get()
         special_gender = self.gender_special_var.get()
         special_category = self.category_special_var.get()
         brand_special_indices = self.brand_special_listbox.curselection()
         special_brand = [self.special_brands[i] for i in brand_special_indices]
-        hermes_category_indices = self.hermes_category_listbox.curselection()
-        hermes_category = [self.hermes_filter[i] for i in hermes_category_indices]
+        # hermes_category_indices = self.hermes_category_listbox.curselection()
+        # hermes_category = [self.hermes_filter[i] for i in hermes_category_indices]
         purchased_place = self.purchased_place_var.get()
         delivery_location = self.delivery_location_var.get()
         season = self.season_var.get()
@@ -2135,8 +2135,8 @@ class InitialOptionWindow:
         elif len(special_brand) == 0 or special_category:
                 messagebox.showerror("警告", "カテゴリー(specialshop)を選択してください。")
         
-        elif len(hermes_category_indices) == 0 :
-                messagebox.showerror("警告", "カテゴリー(HERMES)を選択してください。")
+        # elif len(hermes_category_indices) == 0 :
+        #         messagebox.showerror("警告", "カテゴリー(HERMES)を選択してください。")
         
             
         elif not purchased_place:
@@ -2153,16 +2153,16 @@ class InitialOptionWindow:
         elif not shipping_days:
             messagebox.showerror("警告", "発送までの日数を入力してください。")   
         
-        print("hermes_category", hermes_category)
+        # print("hermes_category", hermes_category)
         print("special_brand", special_brand)
         
         set_value = {
             "pretitle": pretitle,
-            "model_line": model_line,
+            # "model_line": model_line,
             "special_gender": special_gender,
             "special_brand": brand_special_indices,
             "special_category":  self.special_categories.index(special_category)-1,
-            "hermes_category": hermes_category_indices,
+            # "hermes_category": hermes_category_indices,
             "purchased_place": purchased_place,
             "delivery_location": delivery_location,
             "season": season,

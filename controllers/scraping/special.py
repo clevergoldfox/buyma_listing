@@ -585,5 +585,5 @@ def get_details(index, item_url, set_value, folder_path, logging=None):
     if logging:
         logging(f"計算完了 - 出品価格: ¥{product_price:.0f}")    
 
-    product_info = [index, item_title, brand, set_value["model_line"], buyma_category, product_comment, " ", set_value["purchase_deadline"], item_url, set_value["purchased_place"], " ", set_value["delivery_location"], " ", product_color, product_size, set_value["season"], set_value["tag"], " ", product_price, " ", set_value["shipping_method"], mount, product_id, include_tax, listing_memo, img_paths]
+    product_info = [index, item_title, brand, "", buyma_category, product_comment, " ", set_value["purchase_deadline"], item_url, set_value["purchased_place"], " ", set_value["delivery_location"], " ", product_color, product_size, set_value["season"], set_value["tag"], " ", product_price, " ", set_value["shipping_method"], mount, product_id, include_tax, listing_memo, img_paths]
     return product_info
