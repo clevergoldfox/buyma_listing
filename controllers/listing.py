@@ -258,6 +258,8 @@ def listing(products, user, logging=None):
             if title_input:
                 title_input.clear()
                 title = remove_spechar(product[1])
+                # Remove numbers from title
+                title = ''.join(char for char in title if not char.isdigit())
                 title_input.send_keys(title)
             else:
                 print("Title input not found")
