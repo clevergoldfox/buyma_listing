@@ -245,8 +245,8 @@ def listing(products, user, logging=None):
             try:
                 # Adjust the XPath to match the image thumbnail elements after upload
                 num_images = len(images_path)
-                WebDriverWait(driver, 60).until(
-                    lambda d: len(d.find_elements(By.XPATH, "//div[contains(@class, 'bmm-c-image-thumb')]")) >= num_images
+                WebDriverWait(driver, 600).until(
+                    lambda d: len(d.find_elements(By.XPATH, "//a[contains(@class, 'message-gallery__thumb') and contains(@class, 'message-gallery__thumb--image')]/img")) >= num_images
                 )
                 print("All images uploaded.")
             except Exception as e:
