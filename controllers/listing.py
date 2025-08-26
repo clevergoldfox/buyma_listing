@@ -439,6 +439,8 @@ def listing(products, user, logging=None):
             match = re.match(r'^([a-zA-Z ]+)', product[2])
             if match:
                 brand = match.group(1).strip().upper()
+            else:
+                brand = "なし"
             brand_input_xpath = "//p[contains(text(), 'ブランド')]/ancestor::div[contains(@class, 'bmm-l-grid')]//input[@type='text']"
             brand_input = wait_for_element(driver, By.XPATH, brand_input_xpath)
             if brand_input:
@@ -851,6 +853,7 @@ def listing(products, user, logging=None):
             
             print("Listing process completed")
         except Exception as e:
+            driver.refresh()
             print(f"Error in listing process: {e}")
             if logging:
                 logging(f"Error in listing process: {e}")
