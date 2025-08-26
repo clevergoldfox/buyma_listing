@@ -22,7 +22,7 @@ special_brand_id = [
     "1980000794", #  acne studios
     "1980000020", #  adidas by stella mccartney
     "110000088", #  adidas by wales bonner
-    "aesop", #aesop
+    # "aesop", #aesop
     "190000029", #  afri-cani
     "110000130", #  ag jeans
     "110000102", #  agolde
@@ -34,7 +34,7 @@ special_brand_id = [
     "1980000921", #  alexander mcqueen
     "1980000568", #  alice+olivia
     "840000029", #  alysi
-    "ALYSON OLDOINI", #ALYSON OLDOINI
+    # "ALYSON OLDOINI", #ALYSON OLDOINI
     "830000020", #  ami paris
     "1980000913", #  amina muaddi
     "1980000352", #  apuntob
@@ -94,14 +94,14 @@ special_brand_id = [
     "1980000042", #  daniela gregis
     "840000321", #  darkpark
     "190000021", #  daytona 73
-    "DE SIENA", #DE SIENA
+    # "DE SIENA", #DE SIENA
     "110000032", #  diesel
     "190000012", #  disney x coperni
     "4", #  dolce &amp; gabbana
     "840000041", #  dr. martens
     "190000014", #  dragon diffusion
     "1980000049", #  dries van noten
-    "DS&DURGA", #DS&DURGA
+    # "DS&DURGA", #DS&DURGA
     "1", #  dsquared2
     "110000068", #  dunst
     "110000010", #  e.l.v. denim
@@ -128,7 +128,7 @@ special_brand_id = [
     "840000208", #  finamore 1925 napoli
     "190000026", #  floyd
     "1980000493", #  for restless sleepers
-    "FORNICE OBJECTS", #FORNICE OBJECTS
+    # "FORNICE OBJECTS", #FORNICE OBJECTS
     "1980000224", #  forte forte
     "830000097", #  front street 8
     "840000294", #  furling by giani
@@ -160,7 +160,7 @@ special_brand_id = [
     "110000041", #  jean paul gaultier
     "830000010", #  jil sander
     "1980000470", #  jimmy choo
-    "JOZICA", #JOZICA
+    # "JOZICA", #JOZICA
     "110000006", #  juicy couture
     "1980000197", #  junya watanabe
     "110000125", #  junya watanabe x carhartt
@@ -181,7 +181,7 @@ special_brand_id = [
     "1980000843", #  maison margiela
     "1980000096", #  majestic
     "110000129", #  malin franke
-    "MALIN+GOETZ", #MALIN+GOETZ
+    # "MALIN+GOETZ", #MALIN+GOETZ
     "1980000883", #  malone souliers
     "840000069", #  manebi
     "1980000056", #  marant etoile
@@ -196,7 +196,7 @@ special_brand_id = [
     "840000449", #  missoni beachwear
     "1980000892", #  miu miu
     "1980000100", #  mm6 maison margiela
-    "MM6 X DR.MARTENS", #MM6 X DR.MARTENS
+    # "MM6 X DR.MARTENS", #MM6 X DR.MARTENS
     "840000355", #  mm6 x salomon
     "110000128", #  moismont
     "1980000010", #  moncler
