@@ -206,6 +206,8 @@ def listing(products, user, logging=None):
     
     product_count = len(products)
     
+    states = []
+    
     for index, product in enumerate(products):
         print("========================================")
         print(f"product {index} : {product[8]}")
@@ -219,8 +221,8 @@ def listing(products, user, logging=None):
         # Fix the file path - use raw string and forward slashes
             images = product[25]
             images_path = []
-            file_input = driver.find_element(By.XPATH, "//input[@type='file']")
-            driver.execute_script("arguments[0].value = '';", file_input)
+            file_input = driver.find_elements(By.XPATH, "//input[@type='file']")
+            driver.execute_script("arguments[0].value = '';", file_input[0])
             # Collect all valid file paths first
             for image in images:
                 # Convert to absolute path and normalize
@@ -229,17 +231,19 @@ def listing(products, user, logging=None):
                 # Verify file exists
                 if not os.path.exists(image_path):
                     print(f"Error: File not found: {image_path}")
-                    return
+                    continue                
                 
                 images_path.append(image_path)
             
-            if not file_input:
+            if len(file_input) == 0:
                 print("File input not found")
-                return
+                states.append({"status": "error", "detail": "ネットワークエラー"})
+                driver.refresh()
+                continue
             
             # Send all file paths as a single string with newline separators
             all_files_path = '\n'.join(images_path)
-            file_input.send_keys(all_files_path)
+            file_input[0].send_keys(all_files_path)
 
             # Wait until all images are uploaded (wait for thumbnails to appear)
             try:
@@ -251,6 +255,9 @@ def listing(products, user, logging=None):
                 print("All images uploaded.")
             except Exception as e:
                 print(f"Image upload wait failed: {e}")
+                states.append({"status": "error", "detail": "ネットワークエラー"})
+                driver.refresh()
+                continue
             
             # Find and fill title field
             title_input_xpath = "//p[contains(text(), '商品名')]/ancestor::div[contains(@class, 'bmm-l-grid')]//input[@type='text']"
@@ -263,6 +270,9 @@ def listing(products, user, logging=None):
                 title_input.send_keys(title)
             else:
                 print("Title input not found")
+                states.append({"status": "error", "detail": "ネットワークエラー"})
+                driver.refresh()
+                continue
             
             comment_input_xpath = "//p[contains(text(), '商品コメント')]/ancestor::div[contains(@class, 'bmm-l-grid')]//textarea[@class='bmm-c-textarea']"
             comment_input = wait_for_element(driver, By.XPATH, comment_input_xpath)
@@ -272,6 +282,9 @@ def listing(products, user, logging=None):
                 comment_input.send_keys(comment)
             else:
                 print("comment input not found")
+                states.append({"status": "error", "detail": "ネットワークエラー"})
+                driver.refresh()
+                continue
 
             category = product[4]
             if len(category.split("/")) == 3:
@@ -287,7 +300,9 @@ def listing(products, user, logging=None):
             category_input = wait_for_element(driver, By.XPATH, category_input_xpath)
             if not category_input:
                 print("category input not found")
-                return
+                states.append({"status": "error", "detail": "ネットワークエラー"})
+                driver.refresh()
+                continue
 
             # Scroll into view
             driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", category_input)
@@ -316,11 +331,14 @@ def listing(products, user, logging=None):
                     all_categories = driver.find_elements(By.XPATH, "//div[@class='Select-menu-outer']//*[contains(@class, 'Select-option') or contains(@class, 'Select-option')]")
                 except Exception as e:
                     print(f"Could not get available categories: {e}")
-                    
+                    states.append({"status": "error", "detail": "ネットワークエラー"})
+                    driver.refresh()
+                    continue
             except Exception as e:
                 print(f"Dropdown menu did not appear: {e}")
-                driver.save_screenshot("dropdown_not_appeared.png")
-                return
+                states.append({"status": "error", "detail": "ネットワークエラー"})
+                driver.refresh()
+                continue
 
             wait = WebDriverWait(driver, 30)  # wait up to 10 seconds
             
@@ -350,13 +368,15 @@ def listing(products, user, logging=None):
                     pre_cat_value_tag.click()
                 else:
                     print(f"All patterns failed for category: {pre_cat}")
-                    driver.save_screenshot(f"category_error_{pre_cat}.png")
-                    return
+                    states.append({"status": "error", "detail": "ネットワークエラー"})
+                    driver.refresh()
+                    continue
                     
             except Exception as e:
                 print(f"Failed to find category '{pre_cat}': {e}")
-                driver.save_screenshot(f"category_error_{pre_cat}.png")
-                return
+                states.append({"status": "error", "detail": "ネットワークエラー"})
+                driver.refresh()
+                continue
 
             cat_divs = driver.find_elements(By.XPATH, category_input_xpath)
             while len(cat_divs) < 2:
@@ -367,7 +387,9 @@ def listing(products, user, logging=None):
                 WebDriverWait(driver, 30).until(EC.element_to_be_clickable(cat_divs[1])).click()
             except Exception as e:
                 print(f"Failed to click second category dropdown: {e}")
-                return
+                states.append({"status": "error", "detail": "ネットワークエラー"})
+                driver.refresh()
+                continue
 
             wait = WebDriverWait(driver, 30)
 
@@ -381,8 +403,9 @@ def listing(products, user, logging=None):
                 mid_cat_value_tag.click()
             except Exception as e:
                 print(f"Failed to find subcategory '{mid_cat}': {e}")
-                driver.save_screenshot(f"subcategory_error_{mid_cat}.png")
-                return
+                states.append({"status": "error", "detail": "ネットワークエラー"})
+                driver.refresh()
+                continue
 
             if nex_cat:
                 cat_divs = driver.find_elements(By.XPATH, category_input_xpath)
@@ -427,12 +450,15 @@ def listing(products, user, logging=None):
                         nex_cat_value_tag.click()
                     except Exception as e:
                         print(f"Failed to find subcategory '{nex_cat}': {e}")
-                        driver.save_screenshot(f"subcategory_error_{nex_cat}.png")
-                        return
+                        states.append({"status": "error", "detail": "ネットワークエラー"})
+                        driver.refresh()
+                        continue
 
                 except Exception as e:
                     print(f"Failed to click third category dropdown: {e}")
-                    return
+                    states.append({"status": "error", "detail": "ネットワークエラー"})
+                    driver.refresh()
+                    continue
 
             # Find and fill brand field
             brand=""
@@ -448,12 +474,17 @@ def listing(products, user, logging=None):
                 brand_input.send_keys(brand)
             else:
                 print("brand input not found")
+                states.append({"status": "error", "detail": "ネットワークエラー"})
+                driver.refresh()
+                continue
 
             season_input_xpath = "//p[contains(text(), 'シーズン')]/ancestor::div[contains(@class, 'bmm-l-grid')]//div[@class='Select-control']"
             season_input = wait_for_element(driver, By.XPATH, season_input_xpath)
             if not season_input:
                 print("season input not found")
-                return
+                states.append({"status": "error", "detail": "ネットワークエラー"})
+                driver.refresh()
+                continue
 
             # Scroll into view
             driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", season_input)
@@ -509,7 +540,9 @@ def listing(products, user, logging=None):
                 driver.execute_script("arguments[0].click();", tag_check)
             except Exception as e:
                 print(f"Failed to click checkbox for tag '{nex_tag}':", e)
-                driver.save_screenshot("tag_checkbox_error.png")
+                states.append({"status": "error", "detail": "ネットワークエラー"})
+                driver.refresh()
+                continue
             
             tag_sub_btn = driver.find_element(By.XPATH, '//button[text()="選択したタグを設定"]')  
             tag_sub_btn.click()
@@ -572,6 +605,9 @@ def listing(products, user, logging=None):
                 size_name_input.send_keys(size)
             else:
                 print("Not found size_name_input")
+                states.append({"status": "error", "detail": "ネットワークエラー"})
+                driver.refresh()
+                continue
             
             mount = product[21]
             mount_input = driver.find_element(By.XPATH, '//div[@class="sell-amount-input"]//input[@type="text"]')
@@ -653,7 +689,9 @@ def listing(products, user, logging=None):
             purchase_sel = wait_for_element(driver, By.XPATH, purchase_sel_xpath)
             if not purchase_sel:
                 print("purchase_sel not found")
-                return
+                states.append({"status": "error", "detail": "ネットワークエラー"})
+                driver.refresh()
+                continue
 
             # Scroll into view
             driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", purchase_sel)
@@ -732,7 +770,9 @@ def listing(products, user, logging=None):
             delivery_sel = wait_for_element(driver, By.XPATH, delivery_sel_xpath)
             if not delivery_sel:
                 print("delivery_sel not found")
-                return
+                states.append({"status": "error", "detail": "ネットワークエラー"})
+                driver.refresh()
+                continue
 
             # Scroll into view
             driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", delivery_sel)
@@ -810,6 +850,9 @@ def listing(products, user, logging=None):
                 list_memo_input.send_keys(list_memo)
             else:
                 print("list_memo input not found")
+                states.append({"status": "error", "detail": "ネットワークエラー"})
+                driver.refresh()
+                continue
                 
             buyer_name_input_xpath = "//span[text()='買付先名']/preceding-sibling::input[@type='text']"
             buyer_name_input = wait_for_element(driver, By.XPATH, buyer_name_input_xpath)
@@ -818,6 +861,9 @@ def listing(products, user, logging=None):
                 buyer_name_input.send_keys("TESSABIT")
             else:
                 print("buyer_name input not found")
+                states.append({"status": "error", "detail": "ネットワークエラー"})
+                driver.refresh()
+                continue
                 
             buyer_url_input_xpath = "//span[text()='URL']/preceding-sibling::input[@type='text']"
             buyer_url_input = wait_for_element(driver, By.XPATH, buyer_url_input_xpath)
@@ -826,6 +872,9 @@ def listing(products, user, logging=None):
                 buyer_url_input.send_keys("https://www.buyma.com/my/sell/new?tab=b")
             else:
                 print("buyer_url input not found")
+                states.append({"status": "error", "detail": "ネットワークエラー"})
+                driver.refresh()
+                continue
                 
             regist_btn = driver.find_element(By.XPATH, '//button[text()="入力内容を確認する"]')
             regist_btn.click()
@@ -838,6 +887,9 @@ def listing(products, user, logging=None):
                 config_btn.click()
             else:
                 print("Not found Config btn")
+                states.append({"status": "error", "detail": "ネットワークエラー"})
+                driver.refresh()
+                continue
                 
             continue_btn_xpath = "//button[text()='続けて出品する']"
             continue_btn = wait_for_element(driver, By.XPATH, continue_btn_xpath)
@@ -849,12 +901,19 @@ def listing(products, user, logging=None):
             if continue_btn:
                 continue_btn.click()
             else:
-                print("Not found Config btn")
+                print("Not found Continue btn")
+                states.append({"status": "error", "detail": "ネットワークエラー"})
+                driver.refresh()
+                continue
             
             print("Listing process completed")
+            states.append({"status": "success", "detail": "成功"})
         except Exception as e:
-            driver.refresh()
             print(f"Error in listing process: {e}")
             if logging:
                 logging(f"Error in listing process: {e}")
+            states.append({"status": "error", "detail": "ネットワークエラー"})
+            driver.refresh()
             continue
+
+    driver.quit()

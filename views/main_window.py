@@ -167,12 +167,12 @@ class MainWindow:
         ttk.Entry(button_frame, width=5, textvariable=self.days_var).pack(side="left")
         ttk.Label(button_frame, text="日以内に出した商品は除外する").pack(side="left")
 
-        self.hide_mode = tk.BooleanVar()
-        ttk.Checkbutton(button_frame, text="非表示モード", variable=self.hide_mode).pack(side="left", padx=5)
+        # self.hide_mode = tk.BooleanVar()
+        # ttk.Checkbutton(button_frame, text="非表示モード", variable=self.hide_mode).pack(side="left", padx=5)
 
-        self.mode = tk.StringVar(value="出品")
-        ttk.Radiobutton(button_frame, text="下書き", variable=self.mode, value="下書き").pack(side="left")
-        ttk.Radiobutton(button_frame, text="出品", variable=self.mode, value="出品").pack(side="left")
+        # self.mode = tk.StringVar(value="出品")
+        # ttk.Radiobutton(button_frame, text="下書き", variable=self.mode, value="下書き").pack(side="left")
+        # ttk.Radiobutton(button_frame, text="出品", variable=self.mode, value="出品").pack(side="left")
 
         ttk.Button(button_frame, text="開始", command=self.start_process).pack(side="right", padx=10)
         # Add Clear Log button
