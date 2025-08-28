@@ -915,5 +915,5 @@ def listing(products, user, logging=None):
             states.append({"status": "error", "detail": "ネットワークエラー"})
             driver.refresh()
             continue
-
     driver.quit()
+    return states

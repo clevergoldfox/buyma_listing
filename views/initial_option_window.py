@@ -1795,12 +1795,16 @@ class InitialOptionWindow:
         # Row 12: 購入期限 (date input) | 関税を含む
         ttk.Label(main_frame, text="購入期限", font=("Arial", 12)).grid(row=12, column=0, sticky="w", pady=(0, 5), padx=PADX_LEFT)
         ttk.Label(main_frame, text="関税", font=("Arial", 12)).grid(row=12, column=1, sticky="w", pady=(0, 5), padx=PADX_RIGHT)
+        ttk.Label(main_frame, text="自動出品", font=("Arial", 12)).grid(row=12, column=2, sticky="w", pady=(0, 5), padx=PADX_RIGHT)
         self.purchase_deadline_var = tk.StringVar()
         self.purchase_deadline_entry = DateEntry(main_frame, textvariable=self.purchase_deadline_var, width=47, font=("Arial", 12), date_pattern="yyyy/mm/dd")
         self.purchase_deadline_entry.grid(row=13, column=0, sticky="we", pady=PADY, padx=PADX_LEFT)
         self.include_tax_var = tk.BooleanVar(value=True)
         self.include_tax_cb = ttk.Checkbutton(main_frame, text="関税を含む", variable=self.include_tax_var)
         self.include_tax_cb.grid(row=13, column=1, sticky="w", pady=PADY, padx=PADX_RIGHT)
+        self.auto_listing_var = tk.BooleanVar(value=False)
+        self.auto_listing_cb = ttk.Checkbutton(main_frame, text="自動出品", variable=self.auto_listing_var)
+        self.auto_listing_cb.grid(row=13, column=2, sticky="w", pady=PADY, padx=PADX_RIGHT)
 
         # Row 14: BUYMA手数料 | 利益
         ttk.Label(main_frame, text="BUYMA手数料", font=("Arial", 12)).grid(row=14, column=0, sticky="w", pady=(0, 5), padx=PADX_LEFT)
@@ -2123,6 +2127,7 @@ class InitialOptionWindow:
         buyma_fee = self.buyma_fee_var.get()
         profit = self.profit_var.get()
         include_tax = self.include_tax_var.get()
+        auto_listing = self.auto_listing_var.get()
         product_comment = self.product_comment_text.get("1.0", "end-1c")
 
         if not pretitle:
@@ -2173,6 +2178,7 @@ class InitialOptionWindow:
             "buyma_fee": buyma_fee,
             "profit": profit,
             "include_tax": include_tax,
+            "auto_listing": auto_listing,
             "comment": product_comment,
             "bg_path": self.bg_path
         }
@@ -2183,7 +2189,7 @@ class InitialOptionWindow:
             self.parent.scraping_init(set_value, logging=self.log_info)  # If parent has this method
             # Don't destroy the root window - let the parent handle the transition
             print("Settings completed, transitioning to main page...")
-            self.parent.show_main_page()
+            self.parent.show_main_page(auto_listing)
             
     def test_file_dialog(self):
         """Test file dialog functionality for debugging"""

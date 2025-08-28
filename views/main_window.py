@@ -20,7 +20,7 @@ def resource_path(relative_path):
 
 
 class MainWindow:
-    def __init__(self, root: tk.Tk, **kwargs):
+    def __init__(self, root: tk.Tk, **kwargs, auto_listing):
         """
         Initialize the login GUI
         
@@ -41,6 +41,7 @@ class MainWindow:
         self.parent = kwargs.get('parent')
         self.products = self.parent.products
         self.user = self.parent.user
+        self.auto_listing = auto_listing
         # self.products = []
         # self.user = {
         #     "email": "youdan55@yahoo.co.jp",
@@ -133,12 +134,16 @@ class MainWindow:
         
         # Create Treeview
         self.table = ttk.Treeview(table_frame, columns=[], show="headings", height=8)
+        # Map of row_id -> detail message for error rows
+        self.row_detail_map = {}
         
         # Create Scrollbars
         y_scroll = ttk.Scrollbar(table_frame, orient="vertical", command=self.table.yview)
         x_scroll = ttk.Scrollbar(table_frame, orient="horizontal", command=self.table.xview)
         
         self.table.configure(yscrollcommand=y_scroll.set, xscrollcommand=x_scroll.set)
+        # Bind double-click to show detail of error rows
+        self.table.bind("<Double-1>", self.on_row_double_click)
         
         # Grid placement
         self.table.grid(row=0, column=0, sticky="nsew")
@@ -219,22 +224,25 @@ class MainWindow:
                 self.table.insert("", "end", values=row)
                 
     def draw_table(self):
+        headers = ["フォルダ名","商品名","ブランド","モデル・ライン","カテゴリ","商品コメント","色・サイズ補足情報","購入期限","仕入先URL","買付地","ショップ名","発送地","仕入先保存","カラー系統","サイズ","シーズン","タグ","テーマ","価格","参考価格","配送方法名","在庫","型番,メモ","関税負担","出品メモ"]
+        self.table["columns"] = headers
 
-            headers = ["フォルダ名","商品名","ブランド","モデル・ライン","カテゴリ","商品コメント","色・サイズ補足情報","購入期限","仕入先URL","買付地","ショップ名","発送地","仕入先保存","カラー系統","サイズ","シーズン","タグ","テーマ","価格","参考価格","配送方法名","在庫","型番,メモ","関税負担","出品メモ"]
-            self.table["columns"] = headers
+        # Set new headings
+        for col in headers:
+            self.table.heading(col, text=col)
+            self.table.column(col, width=120, anchor="center")
 
-            # Set new headings
-            for col in headers:
-                self.table.heading(col, text=col)
-                self.table.column(col, width=120, anchor="center")
+        # Insert the rest of the rows
+        if len(self.products):
+            for row in self.products:
+                # Pad row if it's shorter than headers
+                if len(row) < len(headers):
+                    row += [""] * (len(headers) - len(row))
+                self.table.insert("", "end", values=row)
+        if self.auto_listing:
+            self.start_process()
 
-            # Insert the rest of the rows
-            if len(self.products):
-                for row in self.products:
-                    # Pad row if it's shorter than headers
-                    if len(row) < len(headers):
-                        row += [""] * (len(headers) - len(row))
-                    self.table.insert("", "end", values=row)
+    
 
     def log_info(self, message):
         self.log_text.insert("end", message + "\n", "info")
@@ -253,7 +261,41 @@ class MainWindow:
 
     def start_process(self):
         self.log_info("Start clicked")
-        listing(self.products, self.user, logging=self.log_info)
+        result = listing(self.products, self.user, logging=self.log_info)
+        for index, res in enumerate(result):
+            if res["status"] == "error":
+                # Color the corresponding row background as yellow
+                try:
+                    row_ids = self.table.get_children()
+                    if 0 <= index < len(row_ids):
+                        target_row_id = row_ids[index]
+                        # Configure a tag for yellow background (idempotent)
+                        self.table.tag_configure("yellow_bg", background="yellow")
+                        # Apply the tag to the specific row
+                        self.table.item(target_row_id, tags=("yellow_bg",))
+                        # Store the detail for this row to show on double-click
+                        self.row_detail_map[target_row_id] = res.get("detail", "")
+                except Exception as e:
+                    print(f"Failed to color row {index}: {e}")
+
+    def on_row_double_click(self, event):
+        try:
+            # Identify the row under mouse or use current selection
+            row_id = self.table.identify_row(event.y)
+            if not row_id:
+                sel = self.table.selection()
+                if sel:
+                    row_id = sel[0]
+            if not row_id:
+                return
+            # If this row has an associated detail, show it
+            if row_id in self.row_detail_map:
+                detail = self.row_detail_map.get(row_id, "")
+                if detail:
+                    messagebox.showinfo("詳細", detail)
+        except Exception as e:
+            print(f"Failed to handle double click: {e}")
+
 
     def open_help(self):
         messagebox.showinfo("ヘルプ", "Q&A will be added here.")
