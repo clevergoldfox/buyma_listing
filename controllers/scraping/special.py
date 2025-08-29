@@ -340,7 +340,7 @@ def get_driver():
             return None
     return driver
 
-def get_past_products():
+def get_past_products(past_days):
     """Return product IDs from product_list.csv within the past 30 days.
 
     Reads a CSV file with headers [Product ID, Date] and filters rows whose
@@ -348,7 +348,7 @@ def get_past_products():
     or parsing fails, returns an empty list.
     """
     csv_path = "product_list.csv"
-    past_days = 30
+    # past_days = 30
     product_ids = []
 
     try:
