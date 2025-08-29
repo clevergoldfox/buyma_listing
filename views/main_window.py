@@ -241,6 +241,7 @@ class MainWindow:
                 if len(row) < len(headers):
                     row += [""] * (len(headers) - len(row))
                 self.table.insert("", "end", values=row)
+        self.save_list()
         if self.auto_listing:
             self.start_process()
             
@@ -248,7 +249,7 @@ class MainWindow:
         csv_file = "product_list.csv"
         
         for product in self.products:
-            product_id = product[22]
+            product_id = product[9].split("product-")[-1]
             current_date = date.today()
             
             # Check if file exists to determine whether to write headers
