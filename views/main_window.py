@@ -241,32 +241,32 @@ class MainWindow:
                 if len(row) < len(headers):
                     row += [""] * (len(headers) - len(row))
                 self.table.insert("", "end", values=row)
-        self.save_list()
+        # self.save_list()
         if self.auto_listing:
             self.start_process()
             
-    def save_list(self):
-        csv_file = "product_list.csv"
+    # def save_list(self):
+    #     csv_file = "product_list.csv"
         
-        for product in self.products:
-            product_id = product[8].split("product-")[-1]
-            current_date = date.today()
+    #     for product in self.products:
+    #         product_id = product[8].split("product-")[-1]
+    #         current_date = date.today()
             
-            # Check if file exists to determine whether to write headers
-            file_exists = os.path.exists(csv_file)
+    #         # Check if file exists to determine whether to write headers
+    #         file_exists = os.path.exists(csv_file)
             
-            # Open file in append mode ('a') to add new rows
-            with open(csv_file, 'a', newline='', encoding='utf-8') as file:
-                writer = csv.writer(file)
+    #         # Open file in append mode ('a') to add new rows
+    #         with open(csv_file, 'a', newline='', encoding='utf-8') as file:
+    #             writer = csv.writer(file)
                 
-                # Write headers only if file doesn't exist
-                if not file_exists:
-                    writer.writerow(['Product ID', 'Date'])
+    #             # Write headers only if file doesn't exist
+    #             if not file_exists:
+    #                 writer.writerow(['Product ID', 'Date'])
                 
-                # Write the product data
-                writer.writerow([product_id, current_date])
+    #             # Write the product data
+    #             writer.writerow([product_id, current_date])
         
-        self.log_info(f"Product data saved to {csv_file}")
+    #     self.log_info(f"Product data saved to {csv_file}")
 
     
     def log_info(self, message):

@@ -391,7 +391,7 @@ def get_past_products(past_days):
 
 def special_scraping(list_urls, set_value, user_data, logging=None):
     past_limit_days = set_value["past_limit_days"]
-    print(get_past_products(past_limit_days))
+    limit_ids = get_past_products(past_limit_days)
     driver = get_driver()
     if driver is None:
         print("Failed to get Chrome WebDriver")
@@ -460,7 +460,10 @@ def special_scraping(list_urls, set_value, user_data, logging=None):
 
             for item in items:
                 item_id = item.get_attribute("id")
-                link = f"http://specialshop.atelier98.net/it/product-{item_id.replace('cont', '')}"
+                item_id_num = item_id.replace('cont', '')
+                if item_id_num in limit_ids:
+                    continue
+                link = f"http://specialshop.atelier98.net/it/product-{item_id_num}"
                 item_urls.append(link)
                 print(link)
             
@@ -474,6 +477,9 @@ def special_scraping(list_urls, set_value, user_data, logging=None):
 
                 for item in items:
                     item_id = item.get_attribute("id")
+                    item_id_num = item_id.replace('cont', '')
+                    if item_id_num in limit_ids:
+                        continue
                     link = f"http://specialshop.atelier98.net/it/product-{item_id.replace('cont', '')}"
                     item_urls.append(link)
                     print(link)

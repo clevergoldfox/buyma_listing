@@ -187,6 +187,7 @@ def login(user, login_url=None):
     human_delay(3, 5)
 
 def listing(products, user, logging=None):
+    ids = []
     driver = get_driver()
     if driver is None:
         print("Failed to get Chrome WebDriver")
@@ -908,6 +909,8 @@ def listing(products, user, logging=None):
             
             print("Listing process completed")
             states.append({"status": "success", "detail": "成功"})
+            success_id = product[8].split("product-")[-1]
+            ids.append(success_id)
         except Exception as e:
             print(f"Error in listing process: {e}")
             if logging:
@@ -916,4 +919,28 @@ def listing(products, user, logging=None):
             driver.refresh()
             continue
     driver.quit()
+    save_list(ids)
     return states
+
+def save_list(ids):
+        csv_file = "product_list.csv"
+        
+        for product_id in self.ids:
+            # product_id = product[8].split("product-")[-1]
+            current_date = date.today()
+            
+            # Check if file exists to determine whether to write headers
+            file_exists = os.path.exists(csv_file)
+            
+            # Open file in append mode ('a') to add new rows
+            with open(csv_file, 'a', newline='', encoding='utf-8') as file:
+                writer = csv.writer(file)
+                
+                # Write headers only if file doesn't exist
+                if not file_exists:
+                    writer.writerow(['Product ID', 'Date'])
+                
+                # Write the product data
+                writer.writerow([product_id, current_date])
+        
+        self.log_info(f"Product data saved to {csv_file}")
