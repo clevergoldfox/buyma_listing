@@ -471,7 +471,10 @@ def special_scraping(list_urls, set_value, user_data, logging=None):
                 logging(f"商品URL収集完了: {len(item_urls)}件")
             
             for i in range(2, page_count+1):
-                page_url = f"{list_url}?page={i}"
+                if "?" in list_url:
+                    page_url = f"{list_url}&page={i}"
+                else:
+                    page_url = f"{list_url}?page={i}"
                 driver.get(page_url)
                 items = driver.find_elements(By.XPATH, "//div[@class='contfoto ']")
 
