@@ -15,6 +15,8 @@ import codecs
 import re
 import os
 import random
+import sys
+import csv
 
 chrome_options = Options()
 chrome_options.add_argument("--headless")  # Run in headless mode (no UI)
@@ -943,4 +945,4 @@ def save_list(ids):
                 # Write the product data
                 writer.writerow([product_id, current_date])
         
-        self.log_info(f"Product data saved to {csv_file}")
+        print(f"Product data saved to {csv_file}")
