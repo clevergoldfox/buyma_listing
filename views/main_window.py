@@ -249,7 +249,7 @@ class MainWindow:
         csv_file = "product_list.csv"
         
         for product in self.products:
-            product_id = product[9].split("product-")[-1]
+            product_id = product[8].split("product-")[-1]
             current_date = date.today()
             
             # Check if file exists to determine whether to write headers
