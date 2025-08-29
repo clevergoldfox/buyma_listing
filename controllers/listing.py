@@ -925,7 +925,7 @@ def listing(products, user, logging=None):
 def save_list(ids):
         csv_file = "product_list.csv"
         
-        for product_id in self.ids:
+        for product_id in ids:
             # product_id = product[8].split("product-")[-1]
             current_date = date.today()
             
