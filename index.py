@@ -138,7 +138,8 @@ class MainApp:
         self.switch_to_window(RegisterWindow, database=self.db, parent=self)
     
     def show_main_page(self, auto_listing):
-        self.switch_to_window(MainWindow, database=self.db, parent=self, auto_listing)
+        self.auto_listing = auto_listing
+        self.switch_to_window(MainWindow, database=self.db, parent=self)
 
     def show_initial_option_window(self, user_data):
         self.user = user_data

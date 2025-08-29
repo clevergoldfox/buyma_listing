@@ -1795,16 +1795,13 @@ class InitialOptionWindow:
         # Row 12: 購入期限 (date input) | 関税を含む
         ttk.Label(main_frame, text="購入期限", font=("Arial", 12)).grid(row=12, column=0, sticky="w", pady=(0, 5), padx=PADX_LEFT)
         ttk.Label(main_frame, text="関税", font=("Arial", 12)).grid(row=12, column=1, sticky="w", pady=(0, 5), padx=PADX_RIGHT)
-        ttk.Label(main_frame, text="自動出品", font=("Arial", 12)).grid(row=12, column=2, sticky="w", pady=(0, 5), padx=PADX_RIGHT)
         self.purchase_deadline_var = tk.StringVar()
         self.purchase_deadline_entry = DateEntry(main_frame, textvariable=self.purchase_deadline_var, width=47, font=("Arial", 12), date_pattern="yyyy/mm/dd")
         self.purchase_deadline_entry.grid(row=13, column=0, sticky="we", pady=PADY, padx=PADX_LEFT)
         self.include_tax_var = tk.BooleanVar(value=True)
         self.include_tax_cb = ttk.Checkbutton(main_frame, text="関税を含む", variable=self.include_tax_var)
         self.include_tax_cb.grid(row=13, column=1, sticky="w", pady=PADY, padx=PADX_RIGHT)
-        self.auto_listing_var = tk.BooleanVar(value=False)
-        self.auto_listing_cb = ttk.Checkbutton(main_frame, text="自動出品", variable=self.auto_listing_var)
-        self.auto_listing_cb.grid(row=13, column=2, sticky="w", pady=PADY, padx=PADX_RIGHT)
+        
 
         # Row 14: BUYMA手数料 | 利益
         ttk.Label(main_frame, text="BUYMA手数料", font=("Arial", 12)).grid(row=14, column=0, sticky="w", pady=(0, 5), padx=PADX_LEFT)
@@ -1833,11 +1830,15 @@ class InitialOptionWindow:
         self.bg_file_label.grid(row=17, column=0, sticky="w", pady=(15, 0), padx=PADX_LEFT)
         self.bg_file_btn = ttk.Button(main_frame, text="背景画像を選択", command=self.select_bg_file, width=16)
         self.bg_file_btn.grid(row=17, column=0, sticky="e", pady=(15, 0), padx=(0, 150))
-        self.complete_btn = ttk.Button(main_frame, text="設定完了", command=self.on_complete, width=16)
-        self.complete_btn.grid(row=17, column=1, sticky="e", pady=(15, 0), padx=PADX_RIGHT)
+        self.auto_listing_var = tk.BooleanVar(value=False)
+        self.auto_listing_cb = ttk.Checkbutton(main_frame, text="自動出品", variable=self.auto_listing_var)
+        self.auto_listing_cb.grid(row=17, column=1, sticky="w", pady=PADY, padx=PADX_RIGHT)
+
 
         # Row 18: Terminal showing area
         ttk.Label(main_frame, text="ターミナル出力", font=("Arial", 12)).grid(row=18, column=0, columnspan=2, sticky="w", pady=(20, 5), padx=PADX_LEFT)
+        self.complete_btn = ttk.Button(main_frame, text="設定完了", command=self.on_complete, width=16)
+        self.complete_btn.grid(row=18, column=1, sticky="e", pady=(15, 0), padx=PADX_RIGHT)
         
         # Create a frame for the terminal area with scrollbars
         terminal_frame = ttk.Frame(main_frame)
@@ -2132,13 +2133,17 @@ class InitialOptionWindow:
 
         if not pretitle:
             messagebox.showerror("警告", "タイトル開始文字を選択してください。")
+            return
         elif special_gender:
                 if len(special_brand) == 0:
                     messagebox.showerror("警告", "ブランド(specialshop)を選択してください。")
+                    return
                 elif not special_category:
                         messagebox.showerror("警告", "カテゴリー(specialshop)を選択してください。")
+                        return
         elif len(special_brand) == 0 or special_category:
                 messagebox.showerror("警告", "カテゴリー(specialshop)を選択してください。")
+                return
         
         # elif len(hermes_category_indices) == 0 :
         #         messagebox.showerror("警告", "カテゴリー(HERMES)を選択してください。")
@@ -2146,17 +2151,23 @@ class InitialOptionWindow:
             
         elif not purchased_place:
             messagebox.showerror("警告", "買付地を選択してください。")
+            return
             
         elif not delivery_location:
             messagebox.showerror("警告", "発送地を選択してください。")
+            return
         elif not season:
             messagebox.showerror("警告", "シーズンを選択してください。")
+            return
         elif not tag:
             messagebox.showerror("警告", "タグを選択してください。")
+            return
         elif not shipping_method:
             messagebox.showerror("警告", "配送方法を選択してください。")
+            return
         elif not shipping_days:
-            messagebox.showerror("警告", "発送までの日数を入力してください。")   
+            messagebox.showerror("警告", "発送までの日数を入力してください。")  
+            return 
         
         # print("hermes_category", hermes_category)
         print("special_brand", special_brand)

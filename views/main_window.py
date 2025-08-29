@@ -20,7 +20,7 @@ def resource_path(relative_path):
 
 
 class MainWindow:
-    def __init__(self, root: tk.Tk, **kwargs, auto_listing):
+    def __init__(self, root: tk.Tk, **kwargs):
         """
         Initialize the login GUI
         
@@ -41,7 +41,7 @@ class MainWindow:
         self.parent = kwargs.get('parent')
         self.products = self.parent.products
         self.user = self.parent.user
-        self.auto_listing = auto_listing
+        self.auto_listing = self.parent.auto_listing
         # self.products = []
         # self.user = {
         #     "email": "youdan55@yahoo.co.jp",
