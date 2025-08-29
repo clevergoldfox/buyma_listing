@@ -1779,60 +1779,73 @@ class InitialOptionWindow:
         
         # Row 10: 配送方法 | 発送までの日数
         ttk.Label(main_frame, text="配送方法", font=("Arial", 12)).grid(row=10, column=0, sticky="w", pady=(0, 5), padx=PADX_LEFT)
-        ttk.Label(main_frame, text="発送までの日数", font=("Arial", 12)).grid(row=10, column=1, sticky="w", pady=(0, 5), padx=PADX_RIGHT)
+        ttk.Label(main_frame, text="購入期限", font=("Arial", 12)).grid(row=10, column=1, sticky="w", pady=(0, 5), padx=PADX_RIGHT)
         self.shipping_method_var = tk.StringVar()
         self.shipping_method_combo = ttk.Combobox(main_frame, textvariable=self.shipping_method_var, state="readonly", width=50)
         self.shipping_method_combo['values'] = self.shipping_methods
         self.shipping_method_combo.grid(row=11, column=0, sticky="we", pady=PADY, padx=PADX_LEFT)
         self.shipping_method_combo.current(0)
         
-        self.shipping_days_var = tk.IntVar(value=1)
-        self.shipping_days_spinbox = tk.Spinbox(
-            main_frame, from_=1, to=30, textvariable=self.shipping_days_var, width=10, font=("Arial", 12)
-        )
-        self.shipping_days_spinbox.grid(row=11, column=1, sticky="w", pady=(0, 15), padx=PADX_RIGHT)
-
-        # Row 12: 購入期限 (date input) | 関税を含む
-        ttk.Label(main_frame, text="購入期限", font=("Arial", 12)).grid(row=12, column=0, sticky="w", pady=(0, 5), padx=PADX_LEFT)
-        ttk.Label(main_frame, text="関税", font=("Arial", 12)).grid(row=12, column=1, sticky="w", pady=(0, 5), padx=PADX_RIGHT)
         self.purchase_deadline_var = tk.StringVar()
         self.purchase_deadline_entry = DateEntry(main_frame, textvariable=self.purchase_deadline_var, width=47, font=("Arial", 12), date_pattern="yyyy/mm/dd")
-        self.purchase_deadline_entry.grid(row=13, column=0, sticky="we", pady=PADY, padx=PADX_LEFT)
-        self.include_tax_var = tk.BooleanVar(value=True)
-        self.include_tax_cb = ttk.Checkbutton(main_frame, text="関税を含む", variable=self.include_tax_var)
-        self.include_tax_cb.grid(row=13, column=1, sticky="w", pady=PADY, padx=PADX_RIGHT)
-        
+        self.purchase_deadline_entry.grid(row=11, column=1, sticky="we", pady=PADY, padx=PADX_RIGHT)
 
-        # Row 14: BUYMA手数料 | 利益
-        ttk.Label(main_frame, text="BUYMA手数料", font=("Arial", 12)).grid(row=14, column=0, sticky="w", pady=(0, 5), padx=PADX_LEFT)
-        ttk.Label(main_frame, text="利益", font=("Arial", 12)).grid(row=14, column=1, sticky="w", pady=(0, 5), padx=PADX_RIGHT)
+        # Row 12: 購入期限 (date input) | 関税を含む
+        self.four_col_frame = ttk.Frame(main_frame)
+        self.four_col_frame.grid(row=12, column=0, columnspan=2, sticky="ew", pady=(10, 0), padx=PADX_LEFT)
+        # Divide this frame into 4 equal-width columns
+        self.four_col_frame.columnconfigure(0, weight=1)
+        self.four_col_frame.columnconfigure(1, weight=1)
+        self.four_col_frame.columnconfigure(2, weight=1)
+        self.four_col_frame.columnconfigure(3, weight=1)
         
+        ttk.Label(self.four_col_frame, text="発送までの日数", font=("Arial", 12)).grid(row=0, column=0, sticky="w", pady=(0, 5), padx=(0, 10))
+        ttk.Label(self.four_col_frame, text="過去の出品制限日数", font=("Arial", 12)).grid(row=0, column=1, sticky="w", pady=(0, 5), padx=(0, 10))
+        ttk.Label(self.four_col_frame, text="BUYMA手数料", font=("Arial", 12)).grid(row=0, column=2, sticky="w", pady=(0, 5), padx=(0, 10))
+        ttk.Label(self.four_col_frame, text="利益", font=("Arial", 12)).grid(row=0, column=3, sticky="w", pady=(0, 5), padx=(0, 10))
+        self.shipping_days_var = tk.IntVar(value=20)
+        self.shipping_days_spinbox = tk.Spinbox(
+            self.four_col_frame, from_=1, to=30, textvariable=self.shipping_days_var, width=10, font=("Arial", 12)
+        )
+        self.shipping_days_spinbox.grid(row=1, column=0, sticky="w", pady=(0, 5), padx=(0, 10))
+        self.past_limit_days_var = tk.IntVar(value=30)
+        self.past_limit_days_spinbox = tk.Spinbox(
+            self.four_col_frame, from_=1, to=30, textvariable=self.past_limit_days_var, width=10, font=("Arial", 12)
+        )
+        self.past_limit_days_spinbox.grid(row=1, column=1, sticky="w", pady=(0, 5), padx=(0, 10))
         self.buyma_fee_var = tk.DoubleVar(value=1.7)
         self.buyma_fee_spinbox = tk.Spinbox(
-            main_frame, from_=0.0, to=100.0, increment=0.1, textvariable=self.buyma_fee_var, width=10, font=("Arial", 12)
+            self.four_col_frame, from_=0.0, to=100.0, increment=0.1, textvariable=self.buyma_fee_var, width=10, font=("Arial", 12)
         )
-        self.buyma_fee_spinbox.grid(row=15, column=0, sticky="w", pady=PADY, padx=PADX_LEFT)
+        self.buyma_fee_spinbox.grid(row=1, column=2, sticky="w", pady=(0, 5), padx=(0, 10))
         
         self.profit_var = tk.DoubleVar(value=1.5)
         self.profit_spinbox = tk.Spinbox(
-            main_frame, from_=0.0, to=1000.0, increment=0.1, textvariable=self.profit_var, width=10, font=("Arial", 12)
+            self.four_col_frame, from_=0.0, to=1000.0, increment=0.1, textvariable=self.profit_var, width=10, font=("Arial", 12)
         )
-        self.profit_spinbox.grid(row=15, column=1, sticky="w", pady=PADY, padx=PADX_RIGHT)
+        self.profit_spinbox.grid(row=1, column=3, sticky="w", pady=(0, 5), padx=(0, 10))
         
-       
-        # Add this after self.bg_file_btn and self.complete_btn
+
+        # Row 14: BUYMA手数料 | 利益
+        ttk.Label(main_frame, text="関税", font=("Arial", 12)).grid(row=14, column=0, sticky="w", pady=(10, 0), padx=PADX_LEFT)
+        ttk.Label(main_frame, text="自動出品", font=("Arial", 12)).grid(row=14, column=1, sticky="w", pady=(10, 0), padx=PADX_RIGHT)
+        self.include_tax_var = tk.BooleanVar(value=True)
+        self.include_tax_cb = ttk.Checkbutton(main_frame, text="関税を含む", variable=self.include_tax_var)
+        self.include_tax_cb.grid(row=15, column=0, sticky="w", pady=(0, 5), padx=PADX_LEFT)
+        self.auto_listing_var = tk.BooleanVar(value=False)
+        self.auto_listing_cb = ttk.Checkbutton(main_frame, text="自動出品する", variable=self.auto_listing_var)
+        self.auto_listing_cb.grid(row=15, column=1, sticky="w", pady=(0, 5), padx=PADX_RIGHT)
+        
+        
+        # Prepare image preview label (will be gridded after selection)
         self.bg_image_label = ttk.Label(main_frame)
-        self.bg_image_label.grid(row=16, column=0, columnspan=2, pady=(0, 10))
         
         # Row 17: File input for background image | 設定完了ボタン
         self.bg_path = None
         self.bg_file_label = ttk.Label(main_frame, text="未選択", width=30)
-        self.bg_file_label.grid(row=17, column=0, sticky="w", pady=(15, 0), padx=PADX_LEFT)
+        self.bg_file_label.grid(row=16, column=1, sticky="w", pady=(0, 5), padx=PADX_RIGHT)
         self.bg_file_btn = ttk.Button(main_frame, text="背景画像を選択", command=self.select_bg_file, width=16)
-        self.bg_file_btn.grid(row=17, column=0, sticky="e", pady=(15, 0), padx=(0, 150))
-        self.auto_listing_var = tk.BooleanVar(value=False)
-        self.auto_listing_cb = ttk.Checkbutton(main_frame, text="自動出品", variable=self.auto_listing_var)
-        self.auto_listing_cb.grid(row=17, column=1, sticky="w", pady=PADY, padx=PADX_RIGHT)
+        self.bg_file_btn.grid(row=17, column=1, sticky="w", pady=(0, 0), padx=PADX_RIGHT)
 
 
         # Row 18: Terminal showing area
@@ -1866,6 +1879,17 @@ class InitialOptionWindow:
         # Configure main frame to expand the terminal area
         main_frame.rowconfigure(19, weight=1)
         
+        # Row 20: Four-column container frame (empty, for future widgets)
+        self.four_col_frame = ttk.Frame(main_frame)
+        self.four_col_frame.grid(row=20, column=0, columnspan=2, sticky="ew", pady=(10, 0), padx=PADX_LEFT)
+        # Divide this frame into 4 equal-width columns
+        self.four_col_frame.columnconfigure(0, weight=1)
+        self.four_col_frame.columnconfigure(1, weight=1)
+        self.four_col_frame.columnconfigure(2, weight=1)
+        self.four_col_frame.columnconfigure(3, weight=1)
+        
+        
+        
         # self.hermes_category_listbox = tk.Listbox(main_frame, selectmode="multiple", width=50, height=8, exportselection=False)
         # for item in self.hermes_filter:
         #     self.hermes_category_listbox.insert(tk.END, item)
@@ -1879,8 +1903,7 @@ class InitialOptionWindow:
         self.product_comment_text = tk.Text(main_frame, width=40, height=5, font=("Arial", 12))
         self.product_comment_text.grid(row=16, column=0, sticky="we", pady=(25, 10), padx=PADX_LEFT)
 
-        self.bg_image_label = ttk.Label(main_frame)
-        self.bg_image_label.grid(row=16, column=1, pady=(0, 10), padx=PADX_RIGHT)
+        # Image preview will be placed after selection in select_bg_file
 
         # Add scroll indicator for macOS users
         self.create_scroll_indicator(canvas)
@@ -2045,12 +2068,12 @@ class InitialOptionWindow:
                 filename = os.path.basename(file_path)
                 print(f"Filename: {filename}")
                 
-                # Update the label text safely
+                # Hide the filename label when an image is selected
                 try:
-                    self.bg_file_label.config(text=filename)
-                    print("Label text updated")
+                    self.bg_file_label.config(text="")
+                    self.bg_file_label.grid_remove()
                 except Exception as e:
-                    print(f"Error updating label text: {e}")
+                    print(f"Error hiding filename label: {e}")
                 
                 # Load and display the image with better error handling
                 try:
@@ -2070,7 +2093,14 @@ class InitialOptionWindow:
                         self.bg_image_label = ttk.Label(self.bg_file_label.master)
                     
                     self.bg_image_label.config(image=self.bg_img_tk)
-                    self.bg_image_label.grid(row=16, column=1, pady=(0, 10), padx=(30, 0))
+                    # Place image spanning rows 16-17 to avoid clipping and show full image
+                    self.bg_image_label.grid(row=16, column=1, rowspan=2, sticky="nw", pady=(0, 10), padx=(30, 0))
+                    # Ensure the row provides enough height for the full image
+                    try:
+                        parent_frame = self.bg_image_label.master
+                        parent_frame.rowconfigure(16, minsize=self.bg_img_tk.height())
+                    except Exception:
+                        pass
                     print("Image display updated successfully")
                     
                 except Exception as e:
@@ -2080,6 +2110,7 @@ class InitialOptionWindow:
                     self.bg_path = None
                     try:
                         self.bg_file_label.config(text="画像読み込みエラー")
+                        self.bg_file_label.grid()
                     except Exception as e2:
                         print(f"Error updating error label: {e2}")
             else:
@@ -2087,6 +2118,7 @@ class InitialOptionWindow:
                 self.bg_path = None
                 try:
                     self.bg_file_label.config(text="未選択")
+                    self.bg_file_label.grid()
                 except Exception as e:
                     print(f"Error updating 'no selection' label: {e}")
                 
@@ -2116,14 +2148,13 @@ class InitialOptionWindow:
         special_category = self.category_special_var.get()
         brand_special_indices = self.brand_special_listbox.curselection()
         special_brand = [self.special_brands[i] for i in brand_special_indices]
-        # hermes_category_indices = self.hermes_category_listbox.curselection()
-        # hermes_category = [self.hermes_filter[i] for i in hermes_category_indices]
         purchased_place = self.purchased_place_var.get()
         delivery_location = self.delivery_location_var.get()
         season = self.season_var.get()
         tag = self.tag_var.get()
         shipping_method = self.shipping_method_var.get()
         shipping_days = self.shipping_days_var.get()
+        past_limit_days = self.past_limit_days_var.get()
         purchase_deadline = self.purchase_deadline_var.get()
         buyma_fee = self.buyma_fee_var.get()
         profit = self.profit_var.get()
@@ -2185,6 +2216,7 @@ class InitialOptionWindow:
             "tag": tag,
             "shipping_method": shipping_method,
             "shipping_days": shipping_days,
+            "past_limit_days": past_limit_days,
             "purchase_deadline": purchase_deadline,
             "buyma_fee": buyma_fee,
             "profit": profit,

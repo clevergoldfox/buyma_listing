@@ -5,7 +5,8 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from webdriver_manager.chrome import ChromeDriverManager
-from datetime import datetime
+from datetime import datetime, timedelta
+import csv
 import time
 import codecs
 import math
@@ -339,8 +340,58 @@ def get_driver():
             return None
     return driver
 
+def get_past_products():
+    """Return product IDs from product_list.csv within the past 30 days.
+
+    Reads a CSV file with headers [Product ID, Date] and filters rows whose
+    Date is within the last 30 days from today. If the file does not exist
+    or parsing fails, returns an empty list.
+    """
+    csv_path = "product_list.csv"
+    past_days = 30
+    product_ids = []
+
+    try:
+        if not os.path.exists(csv_path):
+            return product_ids
+
+        with open(csv_path, newline='', encoding='utf-8') as f:
+            reader = csv.reader(f)
+            # Attempt to read header; continue gracefully if not present
+            header = next(reader, None)
+
+            cutoff_date = datetime.today().date() - timedelta(days=past_days)
+
+            for row in reader:
+                if not row:
+                    continue
+                product_id = row[0].strip() if len(row) >= 1 else ""
+                date_str = row[1].strip() if len(row) >= 2 else ""
+                if not product_id or not date_str:
+                    continue
+
+                parsed_date = None
+                for fmt in ("%Y-%m-%d", "%Y/%m/%d", "%Y.%m.%d"):  # be tolerant to separators
+                    try:
+                        parsed_date = datetime.strptime(date_str, fmt).date()
+                        break
+                    except Exception:
+                        continue
+                if parsed_date is None:
+                    continue
+
+                if parsed_date >= cutoff_date:
+                    product_ids.append(product_id)
+    except Exception:
+        # Fail-safe: return what we have if any unexpected error occurs
+        pass
+
+    return product_ids
+
 
 def special_scraping(list_urls, set_value, user_data, logging=None):
+    past_limit_days = set_value["past_limit_days"]
+    print(get_past_products(past_limit_days))
     driver = get_driver()
     if driver is None:
         print("Failed to get Chrome WebDriver")
