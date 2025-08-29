@@ -2,8 +2,10 @@ import tkinter as tk
 from tkinter import ttk, messagebox, filedialog
 import threading
 from typing import Optional, Callable
+from datetime import date, datetime
 import os
 import sys
+import csv
 
 from controllers.users import get_user_by_email
 from controllers.listing import listing
@@ -241,9 +243,31 @@ class MainWindow:
                 self.table.insert("", "end", values=row)
         if self.auto_listing:
             self.start_process()
+            
+    def save_list(self):
+        csv_file = "product_list.csv"
+        
+        for product in self.products:
+            product_id = product[22]
+            current_date = date.today()
+            
+            # Check if file exists to determine whether to write headers
+            file_exists = os.path.exists(csv_file)
+            
+            # Open file in append mode ('a') to add new rows
+            with open(csv_file, 'a', newline='', encoding='utf-8') as file:
+                writer = csv.writer(file)
+                
+                # Write headers only if file doesn't exist
+                if not file_exists:
+                    writer.writerow(['Product ID', 'Date'])
+                
+                # Write the product data
+                writer.writerow([product_id, current_date])
+        
+        self.log_info(f"Product data saved to {csv_file}")
 
     
-
     def log_info(self, message):
         self.log_text.insert("end", message + "\n", "info")
         self.log_text.see("end")
